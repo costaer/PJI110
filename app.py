@@ -71,43 +71,9 @@ def selecionar_cesta(tipo_cesta):
 
     return cesta
 
-# Exemplo de como usar a função
-cesta_grande = selecionar_cesta("grande")
-print("Cesta Grande:")
-print(cesta_grande)
-
-cesta_pequena = selecionar_cesta("pequena")
-print("Cesta Pequena:")
-print(cesta_pequena)
-    # Retorne os produtos selecionados
-pass
-
 # Função principal da aplicação
-def main():
-    st.title('Controle de Estoque - Empresa de Cesta Básica')
 
-    # Barra lateral para adicionar produtos
-    st.sidebar.title('Adicionar Produto')
-    data_compra = st.sidebar.date_input('Data da Compra')
-    nome = st.sidebar.text_input('Nome do Produto')
-    data_validade = st.sidebar.date_input('Data de Validade')
-    quantidade = st.sidebar.number_input('Quantidade', min_value=1)
-
-    if st.sidebar.button('Adicionar'):
-        adicionar_produto(data_compra, nome, data_validade, quantidade)
-
-    # Mostrar os produtos disponíveis
-    st.subheader('Produtos Disponíveis')
-    produtos = mostrar_produtos()
-    if produtos:
-        for produto in produtos:
-            st.write(produto)
-    else:
-        st.write('Nenhum produto disponível')
-def main():
-    st.title('Controle de Estoque - Empresa de Cesta Básica')
-
-    # Barra lateral para adicionar produtos
+# Barra lateral para adicionar produtos
 produtos_disponiveis = [
     "Arroz", "Feijão", "Óleo", "Açúcar", "Café moído", "Sal", "Extrato de tomate", 
     "Vinagre", "Bolacha recheada", "Bolacha salgada", "Macarrão Espaguete", 
@@ -152,32 +118,29 @@ def main():
         else:
             st.write('Nenhum produto disponível para a cesta {}'.format(tipo_cesta))
 
+    # Consultar o banco de dados para selecionar os produtos da cesta
+    c.execute("SELECT nome, data_validade, quantidade FROM produtos WHERE nome IN ({seq}) ORDER BY data_validade ASC"
+              .format(seq=','.join(['?']*len(produtos_disponiveis))), produtos_disponiveis)
+    produtos_selecionados = c.fetchall()
+
     # Verificar se todos os itens da cesta estão disponíveis no estoque
-    c.execute("SELECT nome, quantidade FROM produtos WHERE nome IN ({seq})".format(seq=','.join(['?']*len(produtos_disponiveis))), produtos_disponiveis)
-    produtos_estoque = c.fetchall()
+    produtos_faltando = [item for item in produtos_disponiveis if item not in [produto[0] for produto in produtos_selecionados]]
 
-    itens_faltando = []
-    for produto in produtos_disponiveis:
-        if produto not in [item[0] for item in produtos_estoque]:
-            itens_faltando.append(produto)
-
-    # Se algum item estiver faltando, exibir mensagem e retornar vazio
-    if itens_faltando:
-        st.warning("Os seguintes itens não estão disponíveis no estoque: {}".format(", ".join(itens_faltando)))
-        return []
+    if produtos_faltando:
+        st.warning("Os seguintes itens não foram encontrados no estoque: {}".format(", ".join(produtos_faltando)))
 
     # Atualizar o estoque subtraindo os produtos selecionados
-    for produto in produtos_estoque:
+    for produto in produtos_selecionados:
         if numero_itens > 0:
             nome_produto = produto[0]
-            quantidade_produto = produto[1]
-            c.execute("UPDATE produtos SET quantidade = quantidade - 1 WHERE nome = ? AND quantidade >= 1", (nome_produto,))
+            quantidade_produto = produto[2]
+            c.execute("UPDATE produtos SET quantidade = quantidade - ? WHERE nome = ? AND quantidade >= ?", (quantidade_produto, nome_produto, quantidade_produto))
             conn.commit()
             numero_itens -= 1
         else:
             break
 
-    return produtos_estoque
+    return produtos_selecionados
 
 # Código para executar a aplicação
 if __name__ == '__main__':
