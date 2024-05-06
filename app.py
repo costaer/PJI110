@@ -118,8 +118,8 @@ if montar:
     
     # Exibir os itens da cesta
     st.subheader('Itens da Cesta:')
-    for item in itens_cesta:
-        st.write(f'{item[4]} x {item[1]} - Compra: {item[2]} - Validade: {item[3]}')
+    for quantidade, nome, data_compra, data_validade, _ in itens_cesta:
+        st.write(f'1 x {nome} - Compra: {data_compra} - Validade: {data_validade}')
 
 # Exibir estoque
 st.header('Estoque:')
