@@ -23,10 +23,18 @@ opcoes_produtos = ['Arroz', 'Feijão', 'Óleo', 'Açúcar', 'Café moído', 'Sal
                    'Sardinha', 'Creme dental', 'Papel higiênico', 'Sabonete', 'Milharina']
 
 
-# Função para adicionar produto ao estoque
+# Função para adicionar produto ao estoque ou atualizar quantidade
 def adicionar_produto(nome, data_compra, data_validade, quantidade):
-    c.execute('''INSERT INTO produtos (nome, data_compra, data_validade, quantidade)
-                  VALUES (?, ?, ?, ?)''', (nome, data_compra, data_validade, quantidade))
+    # Verificar se o produto já existe
+    c.execute('''SELECT * FROM produtos WHERE nome = ? AND data_compra = ? AND data_validade = ?''',
+              (nome, data_compra, data_validade))
+    produto_existente = c.fetchone()
+    if produto_existente:
+        nova_quantidade = produto_existente[4] + quantidade
+        c.execute('''UPDATE produtos SET quantidade = ? WHERE id = ?''', (nova_quantidade, produto_existente[0]))
+    else:
+        c.execute('''INSERT INTO produtos (nome, data_compra, data_validade, quantidade)
+                      VALUES (?, ?, ?, ?)''', (nome, data_compra, data_validade, quantidade))
     conn.commit()
 
 # Função para buscar todos os produtos ordenados por nome
