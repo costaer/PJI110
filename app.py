@@ -58,7 +58,7 @@ def montar_cesta(cesta):
     for item in cesta:
         produtos = buscar_produto_por_nome(item)
         for produto in produtos:
-            itens_cesta.append(produto)
+            itens_cesta.append((1, *produto[1:]))  # Fixar a quantidade em 1
             nova_quantidade = produto[4] - 1
             atualizar_quantidade_produto(produto[0], nova_quantidade)
     return itens_cesta
