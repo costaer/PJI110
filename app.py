@@ -155,11 +155,28 @@ def main():
                 st.write(produto)
         else:
             st.write('Nenhum produto disponível para a cesta {}'.format(tipo_cesta))
-            
+
     # Consultar o banco de dados para selecionar os produtos da cesta
     c.execute("SELECT nome, data_validade, quantidade FROM produtos WHERE nome IN ({seq}) ORDER BY data_validade ASC"
               .format(seq=','.join(['?']*len(produtos_disponiveis))), produtos_disponiveis)
     produtos_selecionados = c.fetchall()
+
+    # Verificar se todos os itens da cesta estão disponíveis no estoque
+    produtos_faltando = [item for item in produtos_disponiveis if item not in [produto[0] for produto in produtos_selecionados]]
+
+    if produtos_faltando:
+        st.warning("Os seguintes itens não foram encontrados no estoque: {}".format(", ".join(produtos_faltando)))
+
+    # Atualizar o estoque subtraindo os produtos selecionados
+    for produto in produtos_selecionados:
+        if numero_itens > 0:
+            nome_produto = produto[0]
+            quantidade_produto = produto[2]
+            c.execute("UPDATE produtos SET quantidade = quantidade - ? WHERE nome = ? AND quantidade >= ?", (quantidade_produto, nome_produto, quantidade_produto))
+            conn.commit()
+            numero_itens -= 1
+        else:
+            break
 
     return produtos_selecionados
 
