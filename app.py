@@ -22,7 +22,6 @@ opcoes_produtos = ['Arroz', 'Feijão', 'Óleo', 'Açúcar', 'Café moído', 'Sal
                    'Achocolatado em pó', 'Leite', 'Goiabada', 'Suco em pó', 'Mistura pra bolo', 'Tempero',
                    'Sardinha', 'Creme dental', 'Papel higiênico', 'Sabonete', 'Milharina']
 
-
 # Função para adicionar produto ao estoque ou atualizar quantidade
 def adicionar_produto(nome, data_compra, data_validade, quantidade):
     # Verificar se o produto já existe
@@ -42,14 +41,9 @@ def buscar_produtos():
     c.execute('''SELECT * FROM produtos ORDER BY nome''')
     return c.fetchall()
 
-# Função para buscar produtos por nome
-def buscar_produto_por_nome(nome):
-    c.execute('''SELECT * FROM produtos WHERE nome = ?''', (nome,))
-    return c.fetchall()
-
-# Função para atualizar quantidade do produto no estoque
-def atualizar_quantidade_produto(id_produto, nova_quantidade):
-    c.execute('''UPDATE produtos SET quantidade = ? WHERE id = ?''', (nova_quantidade, id_produto))
+# Função para atualizar quantidade de produto no estoque
+def atualizar_quantidade_produto(produto_id, nova_quantidade):
+    c.execute('''UPDATE produtos SET quantidade = ? WHERE id = ?''', (nova_quantidade, produto_id))
     conn.commit()
 
 # Função para montar a cesta e encontrar itens faltantes
@@ -63,9 +57,12 @@ def montar_cesta(cesta):
         else:
             produto = produtos[0]
             itens_cesta.append((1, *produto[1:]))  # Fixar a quantidade em 1
-            nova_quantidade = produto[4] - 1
-            atualizar_quantidade_produto(produto[0], nova_quantidade)
     return itens_cesta, itens_faltantes
+
+# Função para buscar produtos por nome
+def buscar_produto_por_nome(nome):
+    c.execute('''SELECT * FROM produtos WHERE nome = ?''', (nome,))
+    return c.fetchall()
 
 # Função para calcular a diferença de dias entre duas datas
 def diferenca_dias(data1, data2):
@@ -95,12 +92,12 @@ if adicionar:
 
 # Barra lateral para selecionar cesta
 st.sidebar.header('Montar Cesta')
-opcoes_cesta = ['Pequena (19 itens)', 'Grande (28 itens)']
+opcoes_cesta = ['Pequena', 'Grande']
 tipo_cesta = st.sidebar.selectbox('Selecione o tipo de cesta:', opcoes_cesta)
 montar = st.sidebar.button('Montar Cesta')
 
 if montar:
-    if tipo_cesta == 'Pequena (19 itens)':
+    if tipo_cesta == 'Pequena':
         cesta = ['Arroz', 'Feijão', 'Óleo', 'Açúcar', 'Café moído', 'Sal', 'Extrato de tomate', 'Bolacha',
                  'Macarrão', 'Farinha de trigo', 'Farinha temperada', 'Goiabada', 'Suco em pó', 'Sardinha',
                  'Creme dental', 'Papel higiênico', 'Sabonete', 'Milharina', 'Tempero']
@@ -111,28 +108,31 @@ if montar:
                  'Goiabada', 'Suco em pó', 'Mistura pra bolo', 'Tempero', 'Sardinha', 'Creme dental',
                  'Papel higiênico', 'Sabonete']
         
-    # Montar a cesta e encontrar itens faltantes
-    itens_cesta, itens_faltantes = montar_cesta(cesta)
+   # Verificar se todos os itens da cesta estão disponíveis no estoque
+    todos_disponiveis = True
+    itens_faltantes = []
+    for item in cesta:
+        produtos = buscar_produto_por_nome(item)
+        if not produtos:
+            todos_disponiveis = False
+            itens_faltantes.append(item)
     
-    # Buscar produtos disponíveis
-    produtos_disponiveis = buscar_produtos()
-    
-    # Selecionar produtos mais próximos da validade
-    produtos_para_cesta = selecionar_proximos_validade(produtos_disponiveis, len(cesta))
-    
-    # Montar a cesta
-    itens_cesta = montar_cesta(cesta)
-    
-    # Exibir os itens da cesta
-    st.subheader('Itens da Cesta:')
-    for item in itens_cesta:
-        st.write(f'{item[4]} x {item[1]} - Compra: {item[2]} - Validade: {item[3]}')
-
-    # Exibir itens faltantes
-    if itens_faltantes:
-        st.subheader('Itens Faltantes:')
-        for item in itens_faltantes:
-            st.write(item)
+    if not todos_disponiveis:
+        st.sidebar.error('Os seguintes itens estão faltando no estoque para completar a cesta: {}'.format(', '.join(itens_faltantes)))
+    else:
+        # Montar a cesta com os itens disponíveis mais próximos da validade
+        itens_cesta = []
+        for item in cesta:
+            produtos = buscar_produto_por_nome(item)
+            produto_mais_proximo = selecionar_proximos_validade(produtos, 1)[0]
+            nova_quantidade = produto_mais_proximo[4] - 1
+            atualizar_quantidade_produto(produto_mais_proximo[0], nova_quantidade)
+            itens_cesta.append((1, *produto_mais_proximo[1:]))  # Fixar a quantidade em 1
+        
+        # Exibir os itens da cesta
+        st.subheader('Itens da Cesta:')
+        for item in itens_cesta:
+            st.write(f'{item[0]} x {item[1]} - Compra: {item[2]} - Validade: {item[3]}')
 
 # Exibir estoque
 st.header('Estoque:')
