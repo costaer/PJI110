@@ -52,16 +52,20 @@ def atualizar_quantidade_produto(id_produto, nova_quantidade):
     c.execute('''UPDATE produtos SET quantidade = ? WHERE id = ?''', (nova_quantidade, id_produto))
     conn.commit()
 
-# Função para montar a cesta
+# Função para montar a cesta e encontrar itens faltantes
 def montar_cesta(cesta):
     itens_cesta = []
+    itens_faltantes = []
     for item in cesta:
         produtos = buscar_produto_por_nome(item)
-        for produto in produtos:
+        if not produtos:
+            itens_faltantes.append(item)
+        else:
+            produto = produtos[0]
             itens_cesta.append((1, *produto[1:]))  # Fixar a quantidade em 1
             nova_quantidade = produto[4] - 1
             atualizar_quantidade_produto(produto[0], nova_quantidade)
-    return itens_cesta
+    return itens_cesta, itens_faltantes
 
 # Função para calcular a diferença de dias entre duas datas
 def diferenca_dias(data1, data2):
@@ -106,6 +110,9 @@ if montar:
                  'Macarrão instantâneo', 'Farinha de trigo', 'Farinha temperada', 'Achocolatado em pó', 'Leite',
                  'Goiabada', 'Suco em pó', 'Mistura pra bolo', 'Tempero', 'Sardinha', 'Creme dental',
                  'Papel higiênico', 'Sabonete']
+        
+    # Montar a cesta e encontrar itens faltantes
+    itens_cesta, itens_faltantes = montar_cesta(cesta)
     
     # Buscar produtos disponíveis
     produtos_disponiveis = buscar_produtos()
@@ -120,6 +127,12 @@ if montar:
     st.subheader('Itens da Cesta:')
     for quantidade, nome, data_compra, data_validade, _ in itens_cesta:
         st.write(f'1 x {nome} - Compra: {data_compra} - Validade: {data_validade}')
+
+    # Exibir itens faltantes
+    if itens_faltantes:
+        st.subheader('Itens Faltantes:')
+        for item in itens_faltantes:
+            st.write(item)
 
 # Exibir estoque
 st.header('Estoque:')
