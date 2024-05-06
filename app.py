@@ -129,6 +129,15 @@ def main():
 
     if st.sidebar.button('Adicionar'):
         adicionar_produto(data_compra, nome, data_validade, quantidade)
+        
+    # Mostrar os produtos disponíveis
+    st.subheader('Produtos Disponíveis')
+    produtos = mostrar_produtos()
+    if produtos:
+        for produto in produtos:
+            st.write(produto)
+    else:
+        st.write('Nenhum produto disponível')
 
     # Barra lateral para selecionar uma cesta
     st.sidebar.subheader('Montar Cesta')
