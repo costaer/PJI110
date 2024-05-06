@@ -129,7 +129,7 @@ def main():
 
     if st.sidebar.button('Adicionar'):
         adicionar_produto(data_compra, nome, data_validade, quantidade)
-        
+
     # Mostrar os produtos disponíveis
     st.subheader('Produtos Disponíveis')
     produtos = mostrar_produtos()
@@ -155,6 +155,13 @@ def main():
                 st.write(produto)
         else:
             st.write('Nenhum produto disponível para a cesta {}'.format(tipo_cesta))
+            
+    # Consultar o banco de dados para selecionar os produtos da cesta
+    c.execute("SELECT nome, data_validade, quantidade FROM produtos WHERE nome IN ({seq}) ORDER BY data_validade ASC"
+              .format(seq=','.join(['?']*len(produtos_disponiveis))), produtos_disponiveis)
+    produtos_selecionados = c.fetchall()
+
+    return produtos_selecionados
 
 # Código para executar a aplicação
 if __name__ == '__main__':
