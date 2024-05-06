@@ -144,11 +144,7 @@ def main():
     tipo_cesta = st.sidebar.radio("Selecione o tipo de cesta:", ("Grande", "Pequena"))
 
     if st.sidebar.button('Montar Cesta'):
-        if tipo_cesta == "Grande":
-            produtos_cesta = selecionar_cesta("grande")
-        else:
-            produtos_cesta = selecionar_cesta("pequena")
-
+        produtos_cesta = selecionar_cesta(tipo_cesta)
         if produtos_cesta:
             st.subheader('Produtos para Cesta {}'.format(tipo_cesta))
             for produto in produtos_cesta:
