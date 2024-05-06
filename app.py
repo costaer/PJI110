@@ -15,6 +15,14 @@ c.execute('''CREATE TABLE IF NOT EXISTS produtos (
                 quantidade INTEGER
             )''')
 
+# Lista de produtos disponíveis
+opcoes_produtos = ['Arroz', 'Feijão', 'Óleo', 'Açúcar', 'Café moído', 'Sal', 'Extrato de tomate',
+                   'Vinagre', 'Bolacha recheada', 'Bolacha salgada', 'Macarrão Espaguete',
+                   'Macarrão parafuso', 'Macarrão instantâneo', 'Farinha de trigo', 'Farinha temperada',
+                   'Achocolatado em pó', 'Leite', 'Goiabada', 'Suco em pó', 'Mistura pra bolo', 'Tempero',
+                   'Sardinha', 'Creme dental', 'Papel higiênico', 'Sabonete', 'Milharina']
+
+
 # Função para adicionar produto ao estoque
 def adicionar_produto(nome, data_compra, data_validade, quantidade):
     c.execute('''INSERT INTO produtos (nome, data_compra, data_validade, quantidade)
@@ -63,7 +71,7 @@ st.title('Controle de Estoque de Cesta Básica')
 
 # Barra lateral para cadastrar produtos
 st.sidebar.header('Cadastrar Produto')
-nome_produto = st.sidebar.text_input('Nome do Produto')
+nome_produto = st.sidebar.text_input('Nome do Produto', opcoes_produtos)
 data_compra = st.sidebar.date_input('Data da Compra')
 data_validade = st.sidebar.date_input('Data de Validade')
 quantidade = st.sidebar.number_input('Quantidade', min_value=1, value=1)
