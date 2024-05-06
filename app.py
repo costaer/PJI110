@@ -108,6 +108,10 @@ def main():
     st.title('Controle de Estoque - Empresa de Cesta Básica')
 
     # Barra lateral para adicionar produtos
+    def main():
+        st.title('Controle de Estoque - Empresa de Cesta Básica')
+
+    # Barra lateral para adicionar produtos
     st.sidebar.title('Adicionar Produto')
     data_compra = st.sidebar.date_input('Data da Compra')
     nome = st.sidebar.text_input('Nome do Produto')
@@ -117,21 +121,26 @@ def main():
     if st.sidebar.button('Adicionar'):
         adicionar_produto(data_compra, nome, data_validade, quantidade)
 
-    # Barra lateral para selecionar o tipo de cesta
+    # Barra lateral para selecionar uma cesta
+    st.sidebar.subheader('Montar Cesta')
     tipo_cesta = st.sidebar.radio("Selecione o tipo de cesta:", ("Grande", "Pequena"))
 
-    # Mostrar os produtos selecionados para a cesta escolhida
-    st.subheader('Produtos para Cesta {}'.format(tipo_cesta))
-    if tipo_cesta == "Grande":
-        produtos_cesta = selecionar_cesta("grande")
-    else:
-        produtos_cesta = selecionar_cesta("pequena")
+    if st.sidebar.button('Montar Cesta'):
+        if tipo_cesta == "Grande":
+            produtos_cesta = selecionar_cesta("grande")
+        else:
+            produtos_cesta = selecionar_cesta("pequena")
 
-    if produtos_cesta:
-        for produto in produtos_cesta:
-            st.write(produto)
-    else:
-        st.write('Nenhum produto disponível para a cesta {}'.format(tipo_cesta))
-        
+        if produtos_cesta:
+            st.subheader('Produtos para Cesta {}'.format(tipo_cesta))
+            for produto in produtos_cesta:
+                st.write(produto)
+        else:
+            st.write('Nenhum produto disponível para a cesta {}'.format(tipo_cesta))
+
+# Código para executar a aplicação
+if __name__ == '__main__':
+    main()
+
 if __name__ == '__main__':
     main()
