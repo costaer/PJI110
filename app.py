@@ -71,7 +71,7 @@ st.title('Controle de Estoque de Cesta Básica')
 
 # Barra lateral para cadastrar produtos
 st.sidebar.header('Cadastrar Produto')
-nome_produto = st.sidebar.text_input('Nome do Produto', opcoes_produtos)
+nome_produto = st.sidebar.selectbox('Nome do Produto', opcoes_produtos)
 data_compra = st.sidebar.date_input('Data da Compra')
 data_validade = st.sidebar.date_input('Data de Validade')
 quantidade = st.sidebar.number_input('Quantidade', min_value=1, value=1)
