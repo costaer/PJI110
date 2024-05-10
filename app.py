@@ -19,7 +19,7 @@ c.execute('''CREATE TABLE IF NOT EXISTS produtos (
 opcoes_produtos = ['Arroz', 'Feijão', 'Óleo', 'Açúcar', 'Café moído', 'Sal', 'Extrato de tomate',
                    'Vinagre', 'Bolacha recheada', 'Bolacha salgada', 'Macarrão Espaguete',
                    'Macarrão parafuso', 'Macarrão instantâneo', 'Farinha de trigo', 'Farinha temperada',
-                   'Achocolatado em pó', 'Leite', 'Goiabada', 'Suco em pó', 'Mistura pra bolo', 'Tempero',
+                   'Achocolatado em pó', 'Leite', 'Goiabada', 'Suco em pó', 'Mistura para bolo', 'Tempero',
                    'Sardinha', 'Creme dental', 'Papel higiênico', 'Sabonete', 'Milharina']
 
 opcoes_produtos.sort()  # Ordenar os produtos em ordem alfabética
@@ -109,7 +109,7 @@ if montar:
         cesta = ['Arroz', 'Feijão', 'Óleo', 'Açúcar', 'Café moído', 'Sal', 'Extrato de tomate', 'Vinagre',
                  'Bolacha recheada', 'Bolacha salgada', 'Macarrão Espaguete', 'Macarrão parafuso',
                  'Macarrão instantâneo', 'Farinha de trigo', 'Farinha temperada', 'Achocolatado em pó', 'Leite',
-                 'Goiabada', 'Suco em pó', 'Mistura pra bolo', 'Tempero', 'Sardinha', 'Creme dental',
+                 'Goiabada', 'Suco em pó', 'Mistura para bolo', 'Tempero', 'Sardinha', 'Creme dental',
                  'Papel higiênico', 'Sabonete']
         
    # Verificar se todos os itens da cesta estão disponíveis no estoque
