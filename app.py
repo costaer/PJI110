@@ -44,6 +44,8 @@ def buscar_produtos():
 # Função para atualizar quantidade de produto no estoque
 def atualizar_quantidade_produto(produto_id, nova_quantidade):
     c.execute('''UPDATE produtos SET quantidade = ? WHERE id = ?''', (nova_quantidade, produto_id))
+    if nova_quantidade <= 0:
+        c.execute('''DELETE FROM produtos WHERE id = ?''', (produto_id,))
     conn.commit()
 
 # Função para montar a cesta e encontrar itens faltantes
