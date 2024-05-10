@@ -22,6 +22,8 @@ opcoes_produtos = ['Arroz', 'Feijão', 'Óleo', 'Açúcar', 'Café moído', 'Sal
                    'Achocolatado em pó', 'Leite', 'Goiabada', 'Suco em pó', 'Mistura pra bolo', 'Tempero',
                    'Sardinha', 'Creme dental', 'Papel higiênico', 'Sabonete', 'Milharina']
 
+opcoes_produtos.sort()  # Ordenar os produtos em ordem alfabética
+
 # Função para adicionar produto ao estoque ou atualizar quantidade
 def adicionar_produto(nome, data_compra, data_validade, quantidade):
     # Verificar se o produto já existe
