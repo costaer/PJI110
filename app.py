@@ -38,6 +38,11 @@ def adicionar_produto(nome, data_compra, data_validade, quantidade):
                       VALUES (?, ?, ?, ?)''', (nome, data_compra, data_validade, quantidade))
     conn.commit()
 
+# Função para buscar todos os produtos ordenados por nome
+def buscar_produtos():
+    c.execute('''SELECT * FROM produtos ORDER BY nome''')
+    return c.fetchall()
+
 # Função para atualizar quantidade de produto no estoque
 def atualizar_quantidade_produto(produto_id, nova_quantidade):
     c.execute('''UPDATE produtos SET quantidade = ? WHERE id = ?''', (nova_quantidade, produto_id))
@@ -135,7 +140,7 @@ if montar:
 
 # Exibir estoque
 st.header('Estoque:')
-produtos_estoque = buscar_produto_por_nome()
+produtos_estoque = buscar_produtos()
 for produto in produtos_estoque:
     st.write(f'{produto[4]} x {produto[2]} - Compra: {produto[1]}  - Validade: {produto[3]}')
 
